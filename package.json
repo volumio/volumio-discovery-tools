@@ -1,0 +1,22 @@
+{
+  "name": "volumio-discovery-tools",
+  "version": "1.0.0",
+  "description": "Tool to discover Volumio Devices on A Network",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/volumio/volumio-discovery-tools.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/volumio/volumio-discovery-tools/issues"
+  },
+  "homepage": "https://github.com/volumio/volumio-discovery-tools#readme",
+  "dependencies": {
+    "mdns": "^2.5.1"
+  }
+}
