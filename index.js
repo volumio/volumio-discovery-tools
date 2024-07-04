@@ -39,8 +39,11 @@ function newVolumioDeviceUp(device) {
         address : parseDeviceAddress(device.addresses)
     }
 
-    pingDevice(device.address).then((delay) => {
-        device.latency = delay;
+    getDeviceStatus(device.address).then((data) => {
+        device.latency = data.delay;
+        device.status = data.state.status || 'stop';
+        device.volume = data.state.volume;
+        device.systemversion = data.systemversion;
         onlineVolumioDevicesArray.push(device);
         printDevicesTable();
     }).catch((err) => {
@@ -83,6 +86,36 @@ function pingDevice(address) {
     });
 }
 
+function getDeviceStatus(address) {
+    return new Promise((resolve, reject) => {
+        const start = Date.now();
+        http.get(`http://${address}/api/v1/getSystemInfo`, (res) => {
+            let data = '';
+
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            res.on('end', () => {
+                const delay = Date.now() - start;
+                try {
+                    data = JSON.parse(data);
+                } catch(e) {
+                    return reject ('No valid JSON returned');
+                }
+                if (data && data.type === 'device') {
+                    data.delay = delay;
+                    resolve(data);
+                } else {
+                    reject('Fail');
+                }
+            });
+        }).on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
 
 function volumioDeviceDown(device) {
     console.log('A device has disappeared, refreshing list');
@@ -108,6 +141,9 @@ console.table(onlineVolumioDevicesArray.map(device => ({
     Name: device.deviceName,
     UUID: device.deviceUUID,
     IP: device.address,
-    LATENCY: device.latency
+    LATENCY: device.latency,
+    STATUS: device.status,
+    VOLUME: device.volume,
+    VERSION: device.systemversion
 })));
 }
