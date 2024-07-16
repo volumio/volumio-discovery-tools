@@ -44,12 +44,17 @@ function newVolumioDeviceUp(device) {
         device.status = data.state.status || 'stop';
         device.volume = data.state.volume;
         device.systemversion = data.systemversion;
-        onlineVolumioDevicesArray.push(device);
+        var deviceExists = onlineVolumioDevicesArray.some(function(existingDevice) {
+            return existingDevice.deviceUUID === device.deviceUUID;
+        });
+
+        if (!deviceExists) {
+            onlineVolumioDevicesArray.push(device);
+        }
         printDevicesTable();
     }).catch((err) => {
         console.error('Error pinging device: ' + device.deviceName + ' at ' + device.address, err.code);
     });
-
 }
 
 function parseDeviceAddress(addresses) {
